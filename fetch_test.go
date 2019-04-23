@@ -28,3 +28,13 @@ func TestFetchDo(t *testing.T) {
 		t.Error("fetch() return wrong http.NewRequest error:\n expect:\n", e, "\n get error message:\n", err)
 	}
 }
+
+func TestHeadStatusOk(t *testing.T) {
+	if headStatusOk("://", nil) {
+		t.Error(`fetch() returned result while it shouldn't'.`)
+	}
+
+	if headStatusOk("", nil) {
+		t.Error(`fetch() returned result while it shouldn't'.`)
+	}
+}

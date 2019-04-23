@@ -104,9 +104,7 @@ func ping(id, source string) []string {
 				// Pixiv will return 403 forbidden if there is no "Refer" header entity.
 				h := append(defaultBrowserHeaders, header{"Referer", illustBaseURL + id + "&page=" + strconv.Itoa(p)})
 
-				_, err := fetch(source+"_p"+strconv.Itoa(p)+format, h)
-
-				if err != nil {
+				if !headStatusOk(source+"_p"+strconv.Itoa(p)+format, h) {
 					break
 				}
 
