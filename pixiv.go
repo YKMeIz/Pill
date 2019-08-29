@@ -1,10 +1,9 @@
 package pill
 
 import (
+	"encoding/json"
 	"regexp"
 	"strconv"
-	"strings"
-	"sync"
 	"time"
 )
 
@@ -12,73 +11,67 @@ import (
 func Pixiv(id string) (PixivInfo, error) {
 
 	// Obtain illustration page.
-	content, err := fetch(illustBaseURL+id, defaultBrowserHeaders)
+	body, err := fetch(illustBaseURL+id, defaultBrowserHeaders)
 	if err != nil {
 		return PixivInfo{}, err
 	}
 
-	// Prepare regular expression for extract each entity of details.
-	tag := regexp.MustCompile(`<meta name="keywords" content=".+">`).FindString(string(content))
-	sources := regexp.MustCompile(`<img src="https://i.pximg.net/[a-zA-Z0-9/\-_.]+"`).FindAllString(string(content), -1)
-	description := regexp.MustCompile(`<meta name="description" content=".+">`).FindString(string(content))
-	member := regexp.MustCompile(`<a href="member.php\?id=[0-9]+">.+</a></h2><span class="date">`).FindString(string(content))
+	// Select necessary json data.
+	content := regexp.MustCompile(`token:.+"storableTags"`).FindString(string(body))
+	content += regexp.MustCompile(`user:.+"background"`).FindString(string(body))
 
-	author := PixivMember{}
-
-	// Parse Pixiv member ID.
-	author.ID = regexp.MustCompile(`member.php\?id=[0-9]+`).FindString(member)
-	author.ID = strings.TrimPrefix(author.ID, "member.php?id=")
-
-	// Parse Pixiv member name.
-	author.Name = strings.TrimSuffix(member, `</a></h2><span class="date">`)
-	nameSplits := strings.Split(author.Name, ">")
-	author.Name = nameSplits[len(nameSplits)-1]
-
-	// Parse Pixiv member avatar url.
-	author.Avatar = regexp.MustCompile(`img src="http.+" alt=`).FindString(member)
-	author.Avatar = strings.TrimPrefix(author.Avatar, `img src="`)
-	author.Avatar = strings.TrimSuffix(author.Avatar, `" alt=`)
-
-	// Parse tags of the illustration.
-	tag = strings.TrimPrefix(tag, `<meta name="keywords" content="`)
-	// Remove useless tag information.
-	tag = strings.TrimSuffix(tag, `,イラスト,pixiv,ピクシブ">`)
-	tags := strings.Split(tag, ",")
-
-	// Extract urls of pictures from illustration page.
-	for _, v := range sources {
-		if strings.Contains(v, id) {
-			re := regexp.MustCompile(`/img[/0-9]+`)
-			// Call ping() to guess right urls.
-			sources = ping(id, pximgBaseURL+re.FindString(v))
-			break
-		}
+	// Extract tags information.
+	tags := regexp.MustCompile(`"tag":".+?"`).FindAllString(content, -1)
+	for i := range tags {
+		tags[i] = tags[i][7 : len(tags[i])-1]
+		tags[i] = decodeUnicode(tags[i])
 	}
 
-	// Parse description texts.
-	descriptionSplits := strings.Split(description, "「")
-	description = regexp.MustCompile(`.+」`).FindString(descriptionSplits[len(descriptionSplits)-1])
-	description = strings.TrimSuffix(description, "」")
+	// Extract illustration title.
+	title := regexp.MustCompile(`"title":".+?"`).FindString(content)
+	title = decodeUnicode(title[9 : len(title)-1])
 
-	// Pixiv utilizes timezone of Japan as date time.
-	tz, err := time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		return PixivInfo{}, err
-	}
+	// Extract illustration description.
+	description := regexp.MustCompile(`"description":".+?"`).FindString(content)
+	description = decodeUnicode(description[15 : len(description)-1])
 
+	// Extract illustration creation date.
+	createdAt := regexp.MustCompile(`"createDate":".+?"`).FindString(content)
 	// Parse date time.
-	t, err := time.ParseInLocation("/2006/01/02/15/04/05/", regexp.MustCompile(`[0-9/]{20,}/`).FindString(sources[0]), tz)
+	t, err := time.Parse(time.RFC3339, createdAt[14:len(createdAt)-1])
 	if err != nil {
 		return PixivInfo{}, err
 	}
+
+	// Extra source url for first original image.
+	sourceURL := regexp.MustCompile(`"original":".+?"`).FindString(content)
+	// Obtain full list of original images if applicable.
+	sources := ping(id, decodeUnicode(sourceURL[12:len(sourceURL)-1]))
+
+	// Extract author ID.
+	authorID := regexp.MustCompile(`"userId":".+?"`).FindString(content)
+	authorID = authorID[10 : len(authorID)-1]
+
+	// Extract author name.
+	authorName := regexp.MustCompile(`"name":".+?"`).FindString(content)
+	authorName = decodeUnicode(authorName[8 : len(authorName)-1])
+
+	// Extract author avatar url.
+	authorAvatar := regexp.MustCompile(`"imageBig":".+?"`).FindString(content)
+	authorAvatar = decodeUnicode(authorAvatar[12 : len(authorAvatar)-1])
 
 	return PixivInfo{
+		Title:       title,
 		ID:          id,
 		Description: description,
 		Tags:        tags,
 		CreatedAt:   t.Unix(),
 		Sources:     sources,
-		Author:      author,
+		Author: PixivMember{
+			ID:     authorID,
+			Name:   authorName,
+			Avatar: authorAvatar,
+		},
 	}, nil
 
 }
@@ -87,35 +80,41 @@ func Pixiv(id string) (PixivInfo, error) {
 func ping(id, source string) []string {
 	var (
 		res []string
-		wg  sync.WaitGroup
+		p   int
 	)
 
-	// Pictures may have file extension of "png" or "jpg"
-	for _, v := range []string{".png", ".jpg"} {
-		wg.Add(1)
+	source = source[:len(source)-7]
+	// .png or .jpg
+	format := source[len(source)-4:]
 
-		go func(format string) {
+	for {
+		// Pixiv will return 403 forbidden if there is no "Refer" header entity.
+		h := append(defaultBrowserHeaders, header{"Referer", illustBaseURL + id + "&page=" + strconv.Itoa(p)})
 
-			defer wg.Done()
+		if !headStatusOk(source+"_p"+strconv.Itoa(p)+format, h) {
+			break
+		}
 
-			p := 0
+		res = append(res, source+"_p"+strconv.Itoa(p)+format)
 
-			for {
-				// Pixiv will return 403 forbidden if there is no "Refer" header entity.
-				h := append(defaultBrowserHeaders, header{"Referer", illustBaseURL + id + "&page=" + strconv.Itoa(p)})
-
-				if !headStatusOk(source+"_p"+strconv.Itoa(p)+format, h) {
-					break
-				}
-
-				res = append(res, source+"_p"+strconv.Itoa(p)+format)
-
-				p++
-			}
-		}(v)
+		p++
 	}
 
-	wg.Wait()
-
 	return res
+}
+
+// decode HTML generated unicode to UTF-8
+func decodeUnicode(s string) string {
+	s = `{"Unicode":"` + s + `"}`
+	tmp := struct {
+		Unicode string
+	}{}
+
+	if err := json.Unmarshal([]byte(s), &tmp); err != nil {
+		// TODO handle err
+		// log.Println(err)
+		return ""
+	}
+
+	return tmp.Unicode
 }

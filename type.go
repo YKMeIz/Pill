@@ -19,6 +19,8 @@ type header struct {
 
 // PixivInfo describes the details of a Pixiv illustration work.
 type PixivInfo struct {
+	// Title is illustration title.
+	Title string `json:"title"`
 	// ID is illustration ID. It comes from url query value of "illust_id".
 	ID string `json:"id"`
 	// Description is the description texts from illustration page.

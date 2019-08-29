@@ -7,6 +7,7 @@
 Pill (**Pi**xiv **il**lustration too**l**) is a parser utilized to grab illustration information from [Pixiv](https://pixiv.net).
 
 Illustration information contains:
+- Illustration Title
 - Description
 - Tags
 - Creation Date & Time (represent in format of unix timestamp)
@@ -51,6 +52,7 @@ The output, in a pretty and human readable JSON format, would be:
 
 ```json
 {
+  "title": "コード:002",
   "id": "66917712",
   "description": "Line drawings converted by exist images.線画は既存の画像で変換されます。",
   "tags": [

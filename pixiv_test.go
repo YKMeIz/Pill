@@ -11,8 +11,9 @@ func init() {
 	samples = make(map[string]PixivInfo)
 
 	samples["66917712"] = PixivInfo{
+		Title:       "コード:002",
 		ID:          "66917712",
-		Description: "Line drawings converted by exist images.線画は既存の画像で変換されます。",
+		Description: "Line drawings converted by exist images.<br />線画は既存の画像で変換されます。",
 		Tags: []string{
 			"Code:002",
 			"線画",
@@ -25,13 +26,14 @@ func init() {
 		Author: PixivMember{
 			ID:     "16412800",
 			Name:   "90榣",
-			Avatar: "https://i.pximg.net/user-profile/img/2018/01/22/19/30/01/13726842_b73c069f1a20efc265f12c2693fea41d_50.png",
+			Avatar: "https://i.pximg.net/user-profile/img/2018/01/22/19/30/01/13726842_b73c069f1a20efc265f12c2693fea41d_170.png",
 		},
 	}
 
 	samples["66917851"] = PixivInfo{
+		Title:       "コード:002と魚",
 		ID:          "66917851",
-		Description: "Line drawings converted by exist images.線画は既存の画像で変換されます。",
+		Description: "Line drawings converted by exist images.<br />線画は既存の画像で変換されます。",
 		Tags: []string{
 			"Code:002",
 			"線画",
@@ -43,7 +45,7 @@ func init() {
 		Author: PixivMember{
 			ID:     "16412800",
 			Name:   "90榣",
-			Avatar: "https://i.pximg.net/user-profile/img/2018/01/22/19/30/01/13726842_b73c069f1a20efc265f12c2693fea41d_50.png",
+			Avatar: "https://i.pximg.net/user-profile/img/2018/01/22/19/30/01/13726842_b73c069f1a20efc265f12c2693fea41d_170.png",
 		},
 	}
 }
