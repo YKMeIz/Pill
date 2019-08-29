@@ -82,10 +82,10 @@ func ping(id, source string) []string {
 		res []string
 		p   int
 	)
-
-	source = source[:len(source)-7]
 	// .png or .jpg
 	format := source[len(source)-4:]
+	// base url before _p0.png/jpg
+	source = source[:len(source)-7]
 
 	for {
 		// Pixiv will return 403 forbidden if there is no "Refer" header entity.
