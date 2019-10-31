@@ -1,3 +1,3 @@
-module github.com/YKMeIz/pill
+module github.com/YKMeIz/Pill
 
-go 1.12
+go 1.13
