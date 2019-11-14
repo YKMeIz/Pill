@@ -1,8 +1,7 @@
 package pill
 
 const (
-	illustBaseURL = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id="
-	pximgBaseURL  = "https://i.pximg.net/img-original"
+	illustBaseURL = "https://www.pixiv.net/en/artworks/"
 )
 
 // defaultBrowserHeaders is utilized to pretend http requests are sent from a browser.
@@ -44,4 +43,31 @@ type PixivMember struct {
 	Name string `json:"name"`
 	// Avatar is url of the Pixiv member avatar.
 	Avatar string `json:"avatar"`
+}
+
+// metaPreloadData is content of HTML tag with id of meta-preload-data.
+type metaPreloadData struct {
+	Illust struct {
+		ID struct {
+			Id          string `json:"id"`
+			Title       string `json:"title"`
+			Description string `json:"description"`
+			CreateDate  string `json:"createDate"`
+			Urls        struct {
+				Original string `json:"original"`
+			} `json:"urls"`
+			Tags struct {
+				Tags []struct {
+					Tag string `json:"tag"`
+				} `json:"tags"`
+			} `json:"tags"`
+		}
+	} `json:"illust"`
+	User struct {
+		ID struct {
+			UserID   string `json:"userID"`
+			Name     string `json:"name"`
+			ImageBig string `json:"imageBig"`
+		}
+	} `json:"user"`
 }
