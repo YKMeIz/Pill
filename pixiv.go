@@ -89,12 +89,13 @@ func ping(source string) []string {
 
 // decode HTML generated unicode to UTF-8
 func decodeUnicode(s string) string {
-	s = `{"Unicode":"` + s + `"}`
+	// Append backslash ahead of quote symbol in order to avoid accidentally ending json value.
+	u := `{"Unicode":"` + strings.ReplaceAll(s, `"`, `\"`) + `"}`
 	tmp := struct {
 		Unicode string
 	}{}
 
-	if err := json.Unmarshal([]byte(s), &tmp); err != nil {
+	if err := json.Unmarshal([]byte(u), &tmp); err != nil {
 		return s
 	}
 
