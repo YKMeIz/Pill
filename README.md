@@ -4,9 +4,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/YKMeIz/Pill?style=flat-square)](https://goreportcard.com/report/github.com/YKMeIz/Pill)
 [![License](https://img.shields.io/github/license/YKMeIz/Pill.svg?color=%232b2b2b&style=flat-square)](https://github.com/YKMeIz/Pill/blob/master/LICENSE)
 
-Pill (**Pi**xiv **il**lustration too**l**) is a parser utilized to grab illustration information from [Pixiv](https://pixiv.net).
+Pill is a parser utilized to grab illustration information from [Pixiv](https://pixiv.net), [yande.re](https://yande.re), and [Konachan](https://konachan.com).
 
-Illustration information contains:
+Pixiv Illustration information contains:
 - Illustration Title
 - Description
 - Tags
@@ -17,7 +17,7 @@ Illustration information contains:
   - Name
   - Avatar URL
 
-More details can be found in [GoDoc](https://godoc.org/github.com/YKMeIz/Pill).
+Others are various. More details can be found in [GoDoc](https://godoc.org/github.com/YKMeIz/Pill).
 
 ## Example
 

@@ -1,7 +1,9 @@
 package pill
 
 const (
-	illustBaseURL = "https://www.pixiv.net/en/artworks/"
+	illustBaseURL   = "https://www.pixiv.net/en/artworks/"
+	yandeBaseURL    = "https://yande.re/post/show/"
+	konachanBaseURL = "https://konachan.com/post/show/"
 )
 
 // defaultBrowserHeaders is utilized to pretend http requests are sent from a browser.
@@ -70,4 +72,51 @@ type metaPreloadData struct {
 			ImageBig string `json:"imageBig"`
 		}
 	} `json:"user"`
+}
+
+// YandeInfo describes the details of a post on yande.re.
+type YandeInfo danbooruBase
+
+// KonachanInfo describes the details of a post on konachan.com.
+type KonachanInfo danbooruBase
+
+// danbooruBase describes the details of a post on danbooru based website.
+type danbooruBase struct {
+	// ID is post ID.
+	ID string `json:"id"`
+	// Tags is the array of tags that post has.
+	Tags []string `json:"tags"`
+	// CreatedAt is unix timestamp of the post creation date time.
+	CreatedAt int64 `json:"created_at"`
+	// Source describes where the post is from. It is usually a url.
+	Source string `json:"source"`
+	// MD5 is md5 hash of the post.
+	MD5 string `json:"md5"`
+	// File is file url of the post.
+	File string `json:"file"`
+	// Sample is sample url of the work. It is usually a small version of original file.
+	Sample string `json:"sample"`
+	// Preview is thumbnail url of the work.
+	Preview string `json:"preview"`
+}
+
+type postRegisterResp struct {
+	Posts []struct {
+		// ID is post ID.
+		ID int64 `json:"id"`
+		// Tags is tags that post has.
+		Tags string `json:"tags"`
+		// CreatedAt is unix timestamp of the post creation date time.
+		CreatedAt int64 `json:"created_at"`
+		// Source describes where the post is from. It is usually a url.
+		Source string `json:"source"`
+		// MD5 is md5 hash of the post.
+		MD5 string `json:"md5"`
+		// File is file url of the post.
+		File string `json:"file_url"`
+		// Sample is sample url of the work. It is usually a small version of original file.
+		Sample string `json:"sample_url"`
+		// Preview is thumbnail url of the work.
+		Preview string `json:"preview_url"`
+	} `json:"posts"`
 }

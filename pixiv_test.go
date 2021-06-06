@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-var samples map[string]PixivInfo
+var pixivSamples map[string]PixivInfo
 
 func init() {
-	samples = make(map[string]PixivInfo)
+	pixivSamples = make(map[string]PixivInfo)
 
-	samples["66917712"] = PixivInfo{
+	pixivSamples["66917712"] = PixivInfo{
 		Title:       "コード:002",
 		ID:          "66917712",
 		Description: "Line drawings converted by exist images.<br />線画は既存の画像で変換されます。",
@@ -30,7 +30,7 @@ func init() {
 		},
 	}
 
-	samples["66917851"] = PixivInfo{
+	pixivSamples["66917851"] = PixivInfo{
 		Title:       "コード:002と魚",
 		ID:          "66917851",
 		Description: "Line drawings converted by exist images.<br />線画は既存の画像で変換されます。",
@@ -51,24 +51,13 @@ func init() {
 }
 
 func TestPixiv(t *testing.T) {
-	for k, v := range samples {
+	for k, v := range pixivSamples {
 		res, err := Pixiv(k)
 		if err != nil {
 			t.Error("Pixiv() execute failed:", err)
 		}
 
-		if reflect.DeepEqual(res, v) {
-			continue
-		}
-
-		resVal := reflect.ValueOf(res)
-		val := reflect.ValueOf(v)
-
-		for i := 0; i < val.NumField(); i++ {
-			if !reflect.DeepEqual(val.Field(i).Interface(), resVal.Field(i).Interface()) {
-				t.Error("Error on", val.Type().Field(i).Name, ": expect", val.Field(i).Interface(), ", get", resVal.Field(i).Interface())
-			}
-		}
+		compareStructVal(t, res, v)
 	}
 }
 
@@ -77,5 +66,20 @@ func TestFetchInPixiv(t *testing.T) {
 
 	if !reflect.DeepEqual(p, PixivInfo{}) {
 		t.Error(`Pixiv() returned result while it shouldn't'.`)
+	}
+}
+
+func compareStructVal(t *testing.T, x, y interface{}) {
+	if reflect.DeepEqual(x, y) {
+		return
+	}
+
+	resVal := reflect.ValueOf(x)
+	val := reflect.ValueOf(y)
+
+	for i := 0; i < val.NumField(); i++ {
+		if !reflect.DeepEqual(val.Field(i).Interface(), resVal.Field(i).Interface()) {
+			t.Error("Error on", val.Type().Field(i).Name, ": expect", val.Field(i).Interface(), ", get", resVal.Field(i).Interface())
+		}
 	}
 }
