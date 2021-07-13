@@ -1,6 +1,6 @@
 # Pill :pill:
 
-[![GoDoc](https://img.shields.io/badge/godoc-reference-informational.svg?style=flat-square)](https://godoc.org/github.com/YKMeIz/Pill)
+[![Go Reference](https://img.shields.io/badge/go-reference-informational.svg?style=flat-square)](https://pkg.go.dev/github.com/YKMeIz/Pill)
 [![Go Report Card](https://goreportcard.com/badge/github.com/YKMeIz/Pill?style=flat-square)](https://goreportcard.com/report/github.com/YKMeIz/Pill)
 [![License](https://img.shields.io/github/license/YKMeIz/Pill.svg?color=%232b2b2b&style=flat-square)](https://github.com/YKMeIz/Pill/blob/master/LICENSE)
 
