@@ -8,11 +8,11 @@ import (
 )
 
 // danbooru returns the parsed details of a post on danbooru based website.
-func danbooru(url string) (danbooruBase, error) {
+func danbooru(url string) (DanbooruBase, error) {
 	// Obtain illustration page.
 	body, err := fetch(url, defaultBrowserHeaders)
 	if err != nil {
-		return danbooruBase{}, err
+		return DanbooruBase{}, err
 	}
 
 	// Select necessary json data.
@@ -23,7 +23,7 @@ func danbooru(url string) (danbooruBase, error) {
 	// Decode json data.
 	var meta postRegisterResp
 	if err := json.Unmarshal([]byte(data), &meta); err != nil {
-		return danbooruBase{}, err
+		return DanbooruBase{}, err
 	}
 
 	// Convert tags string to string array.
@@ -32,7 +32,7 @@ func danbooru(url string) (danbooruBase, error) {
 		tags = append(tags, v)
 	}
 
-	return danbooruBase{
+	return DanbooruBase{
 		ID:        strconv.FormatInt(meta.Posts[0].ID, 10),
 		Tags:      tags,
 		CreatedAt: meta.Posts[0].CreatedAt,

@@ -75,13 +75,13 @@ type metaPreloadData struct {
 }
 
 // YandeInfo describes the details of a post on yande.re.
-type YandeInfo danbooruBase
+type YandeInfo DanbooruBase
 
 // KonachanInfo describes the details of a post on konachan.com.
-type KonachanInfo danbooruBase
+type KonachanInfo DanbooruBase
 
-// danbooruBase describes the details of a post on danbooru based website.
-type danbooruBase struct {
+// DanbooruBase describes the details of a post on danbooru based website.
+type DanbooruBase struct {
 	// ID is post ID.
 	ID string `json:"id"`
 	// Tags is the array of tags that post has.
